@@ -1,0 +1,9 @@
+dev:
+  jwt:
+    secret: "goapisecretkey"
+    audience: "everyone"
+    issuer: "golang"
+  mongo:
+    connectionString: "mongodb://root:155202Asd...@localhost:27017"
+    database: "GoUsersDb"
+    collection: { "User": "Users" }
