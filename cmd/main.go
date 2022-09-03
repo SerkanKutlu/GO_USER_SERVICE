@@ -36,6 +36,8 @@ func main() {
 	//Order Controls
 	e.POST("/api/user/login", userController.Login)
 	e.POST("/api/user/register", userController.Register)
+	e.PUT("/api/user/password", userController.ChangePassword)
+	e.GET("/api/user/validate/:id", userController.ValidateToken)
 	err := e.Start(":9000")
 	if err != nil {
 		panic(err)

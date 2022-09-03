@@ -18,19 +18,47 @@ func (ms *MongoService) Insert(entity *model.User) error {
 }
 
 func (ms *MongoService) LoginCheck(loginDto *dto.UserLoginDto) (*model.User, error) {
-	foundEntity := ms.Users.FindOne(context.Background(), bson.M{"email": loginDto.Email})
-	if foundEntity.Err() != nil {
-		return nil, errors.New("user not found")
-	}
-	var user model.User
-	err := foundEntity.Decode(&user)
-	if err != nil {
-		return nil, err
-	}
-
+	user, err := ms.FindByEmail(loginDto.Email)
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginDto.Password))
 	if err != nil {
 		return nil, errors.New("wrong password")
 	}
-	return &user, nil
+	return user, nil
+}
+
+func (ms *MongoService) Update(user *model.User) error {
+	result, err := ms.Users.ReplaceOne(context.Background(), bson.M{"_id": user.Id}, user)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return errors.New("user not found")
+	}
+	return nil
+}
+
+func (ms *MongoService) FindById(id string) (*model.User, error) {
+	foundEntity := ms.Users.FindOne(context.Background(), bson.M{"_id": id})
+	if foundEntity.Err() != nil {
+		return nil, errors.New("user not found")
+	}
+	var user *model.User
+	err := foundEntity.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (ms *MongoService) FindByEmail(email string) (*model.User, error) {
+	foundEntity := ms.Users.FindOne(context.Background(), bson.M{"email": email})
+	if foundEntity.Err() != nil {
+		return nil, errors.New("user not found")
+	}
+	var user *model.User
+	err := foundEntity.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 	"userService/dto"
 )
 
@@ -33,6 +34,10 @@ func (us *UserService) Login(loginDto *dto.UserLoginDto) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
+	user.PasswordChanged = false
+	if err := us.MongoService.Update(user); err != nil {
+		return nil, err
+	}
 	token, err := us.TokenService.GenerateToken(user)
 	if err != nil {
 		return nil, err
@@ -40,4 +45,29 @@ func (us *UserService) Login(loginDto *dto.UserLoginDto) (*string, error) {
 
 	return token, nil
 
+}
+
+func (us *UserService) ChangePassword(passwordChangeDto *dto.PasswordChangeDto) error {
+	if err := validator.New().Struct(passwordChangeDto); err != nil {
+		return err
+	}
+
+	//Check the user exist with password
+	user, err := us.MongoService.LoginCheck(&dto.UserLoginDto{
+		Email:    passwordChangeDto.Email,
+		Password: passwordChangeDto.OldPassword,
+	})
+	if err != nil {
+		return err
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(passwordChangeDto.NewPassword), 14)
+	if err != nil {
+		return err
+	}
+	user.PasswordChanged = true
+	user.Password = string(hashedPassword)
+	if err := us.MongoService.Update(user); err != nil {
+		return err
+	}
+	return nil
 }
