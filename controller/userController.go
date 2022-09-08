@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/labstack/echo/v4"
+	"strconv"
 	"userService/dto"
 	"userService/handler"
 )
@@ -49,7 +50,12 @@ func (controller *Controller) ChangePassword(c echo.Context) error {
 }
 func (controller *Controller) ValidateToken(c echo.Context) error {
 	id := c.Param("id")
-	if err := controller.UserService.ValidateUserToken(id); err != nil {
+	nbf := c.Param("nbf")
+	nbfInt, err := strconv.ParseInt(nbf, 10, 64)
+	if err != nil {
+		return c.JSON(400, "enter correct nbf")
+	}
+	if err := controller.UserService.ValidateUserToken(nbfInt, id); err != nil {
 		return c.JSON(401, "not a valid token")
 	}
 	return c.JSON(200, "ok")

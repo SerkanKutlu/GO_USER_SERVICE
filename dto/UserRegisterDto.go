@@ -27,6 +27,6 @@ func (urd *UserRegisterDto) ToUser() (*model.User, error) {
 		Email:           urd.Email,
 		Password:        string(hashedPassword),
 		Role:            "User",
-		PasswordChanged: false,
+		PasswordChanged: 0,
 	}, nil
 }

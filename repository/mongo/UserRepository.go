@@ -19,6 +19,9 @@ func (ms *MongoService) Insert(entity *model.User) error {
 
 func (ms *MongoService) LoginCheck(loginDto *dto.UserLoginDto) (*model.User, error) {
 	user, err := ms.FindByEmail(loginDto.Email)
+	if err != nil {
+		return nil, err
+	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginDto.Password))
 	if err != nil {
 		return nil, errors.New("wrong password")
@@ -51,7 +54,7 @@ func (ms *MongoService) FindById(id string) (*model.User, error) {
 }
 
 func (ms *MongoService) FindByEmail(email string) (*model.User, error) {
-	foundEntity := ms.Users.FindOne(context.Background(), bson.M{"email": email})
+	foundEntity := ms.Users.FindOne(context.Background(), bson.M{"Email": email})
 	if foundEntity.Err() != nil {
 		return nil, errors.New("user not found")
 	}
