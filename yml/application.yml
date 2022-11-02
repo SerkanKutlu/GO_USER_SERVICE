@@ -7,3 +7,12 @@ dev:
     connectionString: "mongodb://root:155202Asd...@localhost:27017"
     database: "UserServiceDb"
     collection: { "User": "Users" }
+docker:
+  jwt:
+    secret: "serkanapisecretkey"
+    audience: "everyone"
+    issuer: "golang"
+  mongo:
+    connectionString: "mongodb://root:155202Asd...@mongodb:27017"
+    database: "UserServiceDb"
+    collection: { "User": "Users" }

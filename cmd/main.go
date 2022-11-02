@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"os"
 	"userService/config"
 	"userService/controller"
 	"userService/handler"
@@ -12,9 +11,9 @@ import (
 )
 
 func main() {
-	env := os.Getenv("GO_ENV")
+	env := "docker"
 
-	confManger := config.NewConfigurationManager("yml", "application", env)
+	confManger := config.NewConfigurationManager("../yml", "application", env)
 	//Mongo
 	mongoConf := confManger.GetMongoConfiguration()
 	mongoService := mongodb.GetMongoService(mongoConf)
@@ -38,7 +37,7 @@ func main() {
 	e.POST("/api/user/register", userController.Register)
 	e.PUT("/api/user/password", userController.ChangePassword)
 	e.GET("/api/user/validate/:nbf/:id", userController.ValidateToken)
-	err := e.Start(":9000")
+	err := e.Start(":4001")
 	if err != nil {
 		panic(err)
 	}
